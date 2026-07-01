@@ -2,11 +2,11 @@
 
 <p align="center">
 
-![Platform](https://img.shields.io/badge/Platform-VirtualBox-blue)
+![Platform](https://img.shields.io/badge/Platform-VMware-607078)
 ![OS](https://img.shields.io/badge/OS-Windows%2010%20%7C%20Ubuntu%20Server%20%7C%20Kali%20Linux-success)
 ![SIEM](https://img.shields.io/badge/SIEM-Wazuh-005571)
-![Sysmon](https://img.shields.io/badge/Telemetry-Sysmon-orange)
-![Detection](https://img.shields.io/badge/Detection-Blue%20Team-red)
+![Telemetry](https://img.shields.io/badge/Telemetry-Sysmon-orange)
+![Detection](https://img.shields.io/badge/Detection-Blue%20Team-blue)
 ![Status](https://img.shields.io/badge/Project-Completed-brightgreen)
 
 </p>
@@ -53,7 +53,7 @@ The complete laboratory architecture is illustrated in **`SIEM-Topology.png`**.
 
 | Component | Description |
 |------------|-------------|
-| Hypervisor | VirtualBox |
+| Hypervisor | VMware Workstation |
 | Network | NAT Network |
 | Subnet | 192.168.100.0/24 |
 | SIEM Platform | Wazuh |
@@ -83,7 +83,7 @@ The complete laboratory architecture is illustrated in **`SIEM-Topology.png`**.
 | Windows Defender | Malware Detection |
 | Kali Linux | Penetration Testing |
 | NetExec | SMB Enumeration & Brute Force |
-| VirtualBox | Virtualization |
+| VMware Workstation | Virtualization |
 | Ubuntu Server | SIEM Backend |
 
 ---
@@ -161,6 +161,58 @@ Once the agent is successfully connected, security telemetry becomes visible wit
 The centralized Security Events dashboard displaying collected alerts can be found in:
 
 **`Dashboard-SecurityEvents.png`**
+
+---
+
+# 🛠️ Custom Rules
+
+In addition to Wazuh's built-in detection capabilities, this project includes custom detection rules developed to improve detection accuracy and identify attack behaviors specific to the homelab environment. These rules were implemented in the Wazuh Manager through the local ruleset (`/var/ossec/etc/rules/local_rules.xml`).
+
+The implementation of these custom rules is shown in **`custom-rules.png`**, which contains the detection logic used to identify SMB brute-force activity and PowerShell-based EICAR file creation.
+
+---
+
+## 📜 Custom Detection Rules
+
+| Rule ID | Severity | Detection | Log Source | MITRE ATT&CK |
+|-----------|----------|------------------------------|----------------------------|------------------------------|
+| **100001** | High (10) | SMB Brute Force via NetExec | Windows Security (Event ID 4625) | T1110.003 – Password Spraying |
+| **100002** | Critical (12) | PowerShell EICAR File Drop | Sysmon (Event ID 11) | T1059.001 – PowerShell |
+
+The corresponding Wazuh rule definitions can be viewed in **`custom-rules.png`**, illustrating how both detection rules were implemented within the Wazuh Manager.
+
+---
+
+## 🔍 Detection Strategy
+
+### Rule 100001 — SMB Brute Force Detection
+
+This rule correlates multiple Windows authentication failures (Event ID 4625) within a configurable time window to identify potential SMB brute-force attacks. Instead of generating an alert for every failed authentication, the rule consolidates repeated events into a single high-severity alert, reducing alert fatigue while preserving attack visibility.
+
+### Rule 100002 — PowerShell File Creation Detection
+
+This rule monitors **Sysmon Event ID 11 (File Creation)** to detect PowerShell creating files containing the EICAR test signature. By focusing on file creation behavior rather than solely monitoring process creation events, the rule provides more reliable detection of PowerShell-based activity.
+
+---
+
+## 🧪 Rule Validation
+
+Each custom rule was validated using the **Wazuh Logtest** utility before deployment to verify proper rule matching and alert generation. After validation, the rules were added to the local Wazuh ruleset, as shown in **`custom-rules.png`**, and used throughout the attack simulations presented in this project.
+
+---
+
+## 💡 Engineering Outcome
+
+Developing these custom rules provided practical experience in:
+
+- Wazuh Rule Development
+- Detection Engineering
+- Event Correlation
+- Alert Tuning
+- Behavioral Detection
+- Threat Detection Optimization
+
+By extending Wazuh with custom detection logic, this project demonstrates the ability to create tailored detections that improve alert fidelity while reducing repetitive events—an essential practice in modern Security Operations Centers.
 
 ---
 
