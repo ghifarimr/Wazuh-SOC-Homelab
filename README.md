@@ -418,8 +418,6 @@ Future enhancements for this homelab include:
 - SOAR Integration
 - Multi-Endpoint Monitoring
 
-# 👨‍💻 Author
 
-**Ghifari Maulana Riznanto**
 
 This project was developed as part of my cybersecurity learning journey to gain practical experience in Security Operations Center (SOC), SIEM deployment, and security event investigation using enterprise-grade open-source technologies.
